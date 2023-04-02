@@ -1,0 +1,24 @@
+
+[
+  {
+    'UploadId': 'Qtnr07_MS.bIJQzMnN5cCaSkDj3V8DmRwNdKjsRuJ.8iGGneJ6yL_2jr1HAzysBKIk0KXKtd2Q5j9R9AwlcCoZ6i6y_w4SrjJW3zVs3yf.5Rlw95SFVBGcLw3s6xWHDAHE.3pBKHg4qV8gerY1geNg--',
+    'Key': 'debian.iso',
+    'Initiated': datetime.datetime(2023, 2, 12, 13, 11, 38, tzinfo=tzutc()),
+    'StorageClass': 'STANDARD',
+    'Owner': {
+      'DisplayName': 'jeeguptag+aws',
+      'ID': '5c4773b9f4588b3825d6f3f9cc045be61a3fc90a0b5b27455b7b7c599dee62c9'
+    },
+    'Initiator': {
+      'ID': 'arn:aws:iam::997175659946:user/rishabh.gupta',
+      'DisplayName': 'rishabh.gupta'
+    }
+  },
+  {
+    'UploadId': '3sBYxpdS9Q.65PVuHAZs79nQu8xzFNdB.wgTgv11KiQMbp.8UAhmr_OtjjLpBV.7quVZ8CXPpN5tawBwbvjGW_pMaIQuRv8b93Medb1HxPvNWtsPCTMuB_HONJV3tFYc.sHCfhKv74Ua2BzmkRSjGg--',
+    'Key': 'debian.iso',
+    'Initiated': datetime.datetime(2023, 2, 14, 17, 53, 46, tzinfo=tzutc()),
+    'StorageClass': 'STANDARD',
+    'Owner': {'DisplayName': 'jeeguptag+aws',
+      'ID': '5c4773b9f4588b3825d6f3f9cc045be61a3fc90a0b5b27455b7b7c599dee62c9'},
+    'Initiator': {'ID': 'arn:aws:iam::997175659946:user/rishabh.gupta', 'DisplayName': 'rishabh.gupta'}}, {'UploadId': 'Odqn5QZU7Ag91VgEuSBwEuVVMDmKLOCNInap9LpaVV8F4JZvPCFQsq4lUu_1cRat8kJCYPtsSKBzCRUcmHeBw9mf_A0IozCGp_aMrhuWRMEftEEsXy2tEjaZVhTqvmzMGViZRHDkznb65ewc94QfaQ--', 'Key': 'debian.iso', 'Initiated': datetime.datetime(2023, 2, 14, 17, 56, 39, tzinfo=tzutc()), 'StorageClass': 'STANDARD', 'Owner': {'DisplayName': 'jeeguptag+aws', 'ID': '5c4773b9f4588b3825d6f3f9cc045be61a3fc90a0b5b27455b7b7c599dee62c9'}, 'Initiator': {'ID': 'arn:aws:iam::997175659946:user/rishabh.gupta', 'DisplayName': 'rishabh.gupta'}}, {'UploadId': 'n6CNpXMmlDBOwTS4lYny8ARpRNXq9GtkjYeptzvXjqj74ZLeMOwIoH7vdixLY_hTgSdcdeEjjzWGW_MU4NRjTj82vgvspDDEPbtPGFg4WXDeu3rULQ5KaeLi63nesAueD4HPddpDL9uPvxDlCzACYA--', 'Key': 'webstorm.tar.gz', 'Initiated': datetime.datetime(2023, 2, 14, 18, 42, 50, tzinfo=tzutc()), 'StorageClass': 'STANDARD', 'Owner': {'DisplayName': 'jeeguptag+aws', 'ID': '5c4773b9f4588b3825d6f3f9cc045be61a3fc90a0b5b27455b7b7c599dee62c9'}, 'Initiator': {'ID': 'arn:aws:iam::997175659946:user/rishabh.gupta', 'DisplayName': 'rishabh.gupta'}}, {'UploadId': 'B4gPTOfwZFicDeigY2WIKbQbjipMWmDj7HOMiHPMPOtIT8ZGkK0CAIMtWjDGtu5ysbYWfdi7ghe3UyDWPu8x1ZRTCrLN6acdKWp90KJ1bDY_jy5U7J241_tFPbW9pXUf69uk8u5.wl.cP6TMN_zKpg--', 'Key': 'webstorm.tar.gz', 'Initiated': datetime.datetime(2023, 2, 14, 18, 51, 57, tzinfo=tzutc()), 'StorageClass': 'STANDARD', 'Owner': {'DisplayName': 'jeeguptag+aws', 'ID': '5c4773b9f4588b3825d6f3f9cc045be61a3fc90a0b5b27455b7b7c599dee62c9'}, 'Initiator': {'ID': 'arn:aws:iam::997175659946:user/rishabh.gupta', 'DisplayName': 'rishabh.gupta'}}]

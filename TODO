@@ -1,0 +1,10 @@
+
+- Exception handling : What happens if one or more part fails to upload. How to handle such a case
+
+- Cancelling/Interrupts : What if user cancels the operation mid-way ? Close the lid of his/her system ?
+
+- Using queues : Check if using queues will be useful
+
+- asyncio.sleep() : Use it with 0 delay to see if the code performs better
+
+- Progress bar : Show how much is uploaded and how much more time is left. Will also be useful to show the difference between sync and async code
