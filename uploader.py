@@ -5,6 +5,7 @@ import time
 import queue
 import json
 import os
+import sys
 
 import aiofiles
 import boto3
@@ -18,7 +19,8 @@ s3_file_name = "test-file-24.tar.gz"
 etags = {}
 TOTAL_SIZE = 0
 TOTAL_UPLOADED = 0
-PART_SIZE =  100000000
+PART_SIZE = 100000000
+
 
 async def store_etag(etag, part):
     global etags
@@ -36,7 +38,6 @@ def complete_upload(upload_id):
 
     for idx in range(1, 5+1):
         _etags_.append(etags[str(idx)])
-
 
     try:
         response = s3_client.complete_multipart_upload(
@@ -71,14 +72,12 @@ def upload_part(chunk, part, upload_id):
         return response['ETag'], part
 
 
-
-def initiateUpload(file_name: str) -> str:
+def initiate_upload(file_name: str) -> str:
     response = s3_client.create_multipart_upload(
         Bucket="async-data-v1",
         Key=file_name
     )
     return response['UploadId']
-
 
 
 async def read_and_upload(file_path: str, start_pos: int, end_pos: int, part_number: int, upload_id: str):
@@ -99,13 +98,11 @@ async def read_and_upload(file_path: str, start_pos: int, end_pos: int, part_num
 
             percent_uploaded = (TOTAL_UPLOADED/TOTAL_SIZE)*100
 
-
             show_progress(int(percent_uploaded))
 
 
-
 # entry point coroutine
-async def main():
+async def main(args: list):
     # create the task coroutine
     # coro = upload_part()
     # # wrap in a task object and schedule execution
@@ -114,44 +111,62 @@ async def main():
     # Do some sanity checks on the file
     # Create a multipart upload request
 
-    upload_id = initiateUpload(s3_file_name)
+    try:
+        global s3_file_name
+        local_file_name = args[0]
+        s3_file_name = args[1]
+    except Exception as exc:
+        print("Please provide the required input")
+        return
+
+    print("Local file name {} ".format(local_file_name))
+    print("Remote file name {} ".format(s3_file_name))
+
+    upload_id = initiate_upload(s3_file_name)
     print("\nUpload Id -> {}\n".format(upload_id))
-    file_path_win = 'C:\\Users\\risha\\Downloads\\debian-11.5.0-amd64-netinst.iso'
-    file_path_linux = '/home/zboon/Downloads/pycharm-community-2023.1.tar.gz'
+    # file_path_win = 'C:\\Users\\risha\\Downloads\\debian-11.5.0-amd64-netinst.iso'
+    # file_path_linux = '/home/zboon/Downloads/pycharm-community-2023.1.tar.gz'
 
+    # TODO: Divide the file only if file size is greater than 100 MBs
 
-    global TOTAL_SIZE
-    part_size = 104857599  # 100 MBs
-    TOTAL_SIZE = total_size = os.path.getsize(file_path_linux)
-    total_parts = int(total_size/part_size)
+    file_size = os.path.getsize(local_file_name)
+    if file_size > 104857600:
 
-    start = -104857599
-    end = 0
+        global TOTAL_SIZE
+        part_size = 104857599  # 100 MBs
+        TOTAL_SIZE = total_size = os.path.getsize(local_file_name)
+        total_parts = int(total_size/part_size)
 
-    tasks = []
+        start = -104857599
+        end = 0
 
-    print("size of the file {}".format(TOTAL_SIZE))
-    for i in range(1, total_parts + 1):
-        part_number = i
-        start_pos = start + part_size
-        end_pos = start_pos + part_size
+        tasks = []
 
-        if i == total_parts:
-            end_pos = total_size
-        start = start_pos + 1
+        print("size of the file {}".format(TOTAL_SIZE))
+        for i in range(1, total_parts + 1):
+            part_number = i
+            start_pos = start + part_size
+            end_pos = start_pos + part_size
 
-        tasks.append(read_and_upload(file_path_linux, start_pos, end_pos, part_number, upload_id))
+            if i == total_parts:
+                end_pos = total_size
+            start = start_pos + 1
 
-    await asyncio.gather(*tasks)
+            tasks.append(read_and_upload(local_file_name, start_pos, end_pos, part_number, upload_id))
 
-    if complete_upload(upload_id):
-        print("\nUpload complete")
+        await asyncio.gather(*tasks)
+
+        if complete_upload(upload_id):
+            print("\nUpload complete")
+
+    else:
+        print("Files with size less than 100 MBs not supported")
 
 
 
 if __name__ == '__main__':
     start = time.perf_counter()
-    asyncio.run(main())
+    args = sys.argv[1:]
+    asyncio.run(main(args))
     total = time.perf_counter() - start
-
     print('Executed in {} seconds'.format(round(total, 0)))
