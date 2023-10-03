@@ -6,6 +6,7 @@ import queue
 import json
 import os
 import sys
+from functools import partial
 
 import aiofiles
 import boto3
@@ -14,48 +15,46 @@ from progress_bar import show_progress
 session = boto3.Session(profile_name='personal')
 s3_client = session.client('s3')
 
-s3_file_name = "test-file-24.tar.gz"
+s3_file_name = ""
 
-etags = {}
+etags = []
 TOTAL_SIZE = 0
 TOTAL_UPLOADED = 0
 PART_SIZE = 100000000
 
 
+print("PID = {}".format(os.getpid()))
+
+
 async def store_etag(etag, part):
-    global etags
+    pass
+    # global etags
+    #
+    # etags[str(part)] = {
+    #     'ETag': etag,
+    #     'PartNumber': part
+    # }
 
-    etags[str(part)] = {
-        'ETag': etag,
-        'PartNumber': part
-    }
 
-
-def complete_upload(upload_id):
-
-    upload_complete = True
-    _etags_ = []
-
-    for idx in range(1, 5+1):
-        _etags_.append(etags[str(idx)])
-
+def complete_upload(result, upload_id:str):
+    global  etags
+    etags.sort(key=lambda x: x['PartNumber'])
     try:
         response = s3_client.complete_multipart_upload(
             Bucket="async-data-v1",
             Key=s3_file_name,
             MultipartUpload={
-                'Parts': _etags_
+                'Parts': etags
             },
             UploadId=upload_id
         )
     except Exception as exc:
         print("Failed to complete multi part upload - {}".format(exc))
-        upload_complete = False
 
-    return upload_complete
+    finally:
+        print("Upload complete!!")
 
 
-# define a coroutine to run as a task
 def upload_part(chunk, part, upload_id):
     try:
         response = s3_client.upload_part(
@@ -69,7 +68,7 @@ def upload_part(chunk, part, upload_id):
         print("Failed to upload part - {}".format(exc))
 
     else:
-        return response['ETag'], part
+        return {'PartNumber': part, 'ETag': response['ETag']}
 
 
 def initiate_upload(file_name: str) -> str:
@@ -80,36 +79,29 @@ def initiate_upload(file_name: str) -> str:
     return response['UploadId']
 
 
-async def read_and_upload(file_path: str, start_pos: int, end_pos: int, part_number: int, upload_id: str):
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+async def read_and_upload(file_path: str, part_size: int, upload_id: str):
+
+    async with aiofiles.open(file_path, 'rb') as fp:
         futures = []
-        async with aiofiles.open(file_path, 'rb') as fp:
-            await fp.seek(start_pos)
-            chunk = await fp.read(end_pos - start_pos)
-            futures.append(executor.submit(upload_part, chunk, part_number, upload_id))
+        part_number = 1
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            while True:
+                # read the file
+                chunk = await fp.read(part_size)
+
+                if not chunk:
+                    break
+
+                futures.append(executor.submit(upload_part, chunk, part_number, upload_id))
+                part_number += 1
 
         for future in concurrent.futures.as_completed(futures):
-            etag, part = future.result()
-            await store_etag(etag, part)
-            uploaded_size = (end_pos - start_pos) + 1
-            global TOTAL_UPLOADED
-
-            TOTAL_UPLOADED += uploaded_size
-
-            percent_uploaded = (TOTAL_UPLOADED/TOTAL_SIZE)*100
-
-            show_progress(int(percent_uploaded))
+            global etags
+            etags.append(future.result())
 
 
 # entry point coroutine
 async def main(args: list):
-    # create the task coroutine
-    # coro = upload_part()
-    # # wrap in a task object and schedule execution
-    # task = asyncio.create_task(coro)
-
-    # Do some sanity checks on the file
-    # Create a multipart upload request
 
     try:
         global s3_file_name
@@ -122,46 +114,21 @@ async def main(args: list):
     print("Local file name {} ".format(local_file_name))
     print("Remote file name {} ".format(s3_file_name))
 
+
     upload_id = initiate_upload(s3_file_name)
     print("\nUpload Id -> {}\n".format(upload_id))
-    # file_path_win = 'C:\\Users\\risha\\Downloads\\debian-11.5.0-amd64-netinst.iso'
-    # file_path_linux = '/home/zboon/Downloads/pycharm-community-2023.1.tar.gz'
 
     # TODO: Divide the file only if file size is greater than 100 MBs
 
     file_size = os.path.getsize(local_file_name)
     if file_size > 104857600:
-
-        global TOTAL_SIZE
-        part_size = 104857599  # 100 MBs
-        TOTAL_SIZE = total_size = os.path.getsize(local_file_name)
-        total_parts = int(total_size/part_size)
-
-        start = -104857599
-        end = 0
-
-        tasks = []
-
-        print("size of the file {}".format(TOTAL_SIZE))
-        for i in range(1, total_parts + 1):
-            part_number = i
-            start_pos = start + part_size
-            end_pos = start_pos + part_size
-
-            if i == total_parts:
-                end_pos = total_size
-            start = start_pos + 1
-
-            tasks.append(read_and_upload(local_file_name, start_pos, end_pos, part_number, upload_id))
-
-        await asyncio.gather(*tasks)
-
-        if complete_upload(upload_id):
-            print("\nUpload complete")
-
+        etags = []
+        part_size = 5 * 1024 * 1024  # 5 MB
+        task = asyncio.create_task(read_and_upload(local_file_name, part_size, upload_id))
+        task.add_done_callback(partial(complete_upload, upload_id=upload_id))
+        await task
     else:
         print("Files with size less than 100 MBs not supported")
-
 
 
 if __name__ == '__main__':
