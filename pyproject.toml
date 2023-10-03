@@ -1,0 +1,13 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fus3"
+version = "0.0.1"
+authors = [
+  { name="Rishabh Gupta"},
+]
+description = "S3 file uploader"
+readme = "README.md"
+requires-python = ">=3.10"
