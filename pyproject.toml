@@ -4,10 +4,19 @@ build-backend = "hatchling.build"
 
 [project]
 name = "fus3"
-version = "0.0.1"
+version = "0.0.7"
 authors = [
   { name="Rishabh Gupta"},
 ]
 description = "S3 file uploader"
 readme = "README.md"
 requires-python = ">=3.10"
+
+[tool.hatch.build]
+exclude = [
+  "rust/",
+  ".idea/",
+  ".vscode",
+  "experiment",
+  "build.md"
+]
