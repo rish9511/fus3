@@ -10,7 +10,7 @@ from functools import partial
 
 import aiofiles
 import boto3
-from progress_bar import show_progress
+# from progress_bar import show_progress
 
 session = boto3.Session(profile_name='personal')
 s3_client = session.client('s3')
@@ -131,9 +131,9 @@ async def main(args: list):
         print("Files with size less than 100 MBs not supported")
 
 
-if __name__ == '__main__':
-    start = time.perf_counter()
-    args = sys.argv[1:]
-    asyncio.run(main(args))
-    total = time.perf_counter() - start
-    print('Executed in {} seconds'.format(round(total, 0)))
+# if __name__ == '__main__':
+#     start = time.perf_counter()
+#     args = sys.argv[1:]
+#     asyncio.run(main(args))
+#     total = time.perf_counter() - start
+#     print('Executed in {} seconds'.format(round(total, 0)))
