@@ -23,7 +23,7 @@ TOTAL_UPLOADED = 0
 PART_SIZE = 100000000
 
 
-print("PID = {}".format(os.getpid()))
+# print("PID = {}".format(os.getpid()))
 
 
 async def store_etag(etag, part):
