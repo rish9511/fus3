@@ -10,6 +10,7 @@ from functools import partial
 
 import aiofiles
 import boto3
+
 # from progress_bar import show_progress
 
 session = boto3.Session(profile_name='personal')
@@ -52,7 +53,7 @@ def complete_upload(result, upload_id:str):
         print("Failed to complete multi part upload - {}".format(exc))
 
     finally:
-        print("Upload complete!!")
+        print("\nUpload complete!!")
 
 
 def upload_part(chunk, part, upload_id):

@@ -43,7 +43,7 @@ def get_active_network_interface():
         return None
 
 
-if __name__ == "__main__":
+def display_network_speed():
     active_interface = get_active_network_interface()
     if active_interface:
         print(f"Active network interface: {active_interface}")
