@@ -18,6 +18,8 @@ s3_client = session.client('s3')
 
 s3_file_name = ""
 
+num_workers = 10
+
 etags = []
 TOTAL_SIZE = 0
 TOTAL_UPLOADED = 0
@@ -85,7 +87,7 @@ async def read_and_upload(file_path: str, part_size: int, upload_id: str):
     async with aiofiles.open(file_path, 'rb') as fp:
         futures = []
         part_number = 1
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers) as executor:
             while True:
                 # read the file
                 chunk = await fp.read(part_size)
@@ -102,10 +104,13 @@ async def read_and_upload(file_path: str, part_size: int, upload_id: str):
 
 
 # entry point coroutine
-async def main(args: list):
+async def main(args: list, max_workers: int):
 
     try:
         global s3_file_name
+        global num_workers
+
+        num_workers = max_workers
         local_file_name = args[0]
         s3_file_name = args[1]
     except Exception as exc:
